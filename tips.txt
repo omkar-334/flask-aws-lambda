@@ -1,0 +1,106 @@
+[Build a Python REST API with Serverless, Lambda, and DynamoDB](https://www.serverless.com/blog/flask-python-rest-api-serverless-lambda-dynamodb/#converting-an-existing-flask-application)
+
+## Setting up SLS Framework
+
+[Setting Up Serverless Framework With AWS](https://www.serverless.com/framework/docs/getting-started)
+
+1. Install Node.js, npm
+2. Install serverless
+
+```python
+npm install -g serverless
+```
+
+1. Create a serverless project
+
+```python
+serverless
+(Select flask-api project)
+```
+
+1. Name your project and move into that created directory
+2. If you want to install from github - 
+
+```python
+serverless --template-url=https://github.com/serverless/examples/tree/v3/...
+```
+
+1. Deploy
+
+```python
+sls deploy
+```
+
+## Setting up App Folder
+
+1. Create folder and move into it
+2. Initialize npm and install dependencies
+
+```python
+npm init -f
+npm install --save-dev serverless-wsgi serverless-python-requirements
+```
+
+## YML file
+
+```python
+# serverless.yml
+
+service: serverless-flask
+
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
+
+custom:
+  wsgi:
+    app: app.app
+    packRequirements: false
+  pythonRequirements:
+    dockerizePip: non-linux
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: dev
+  region: us-east-1
+
+functions:
+  app:
+    handler: wsgi.handler
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+```
+
+## VENV & Requirements
+
+Create a virtual environment and freeze requirements.
+
+```python
+virtualenv venv --python=python3
+venv\Scripts\activate
+
+pip install flask
+pip freeze > requirements.txt
+```
+
+## Errors
+
+```python
+handler:wsgi_handler.handler → handler:ap.handler
+
+custom:
+	pythonRequirements:
+		pythonBin:python3
+		dockerizePip:"false"
+
+package:
+	patterns:
+		- "!node-modules"
+		- "!venv"
+
+http:
+	ANY/{proxy+}
+
+```
